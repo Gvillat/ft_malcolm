@@ -1,0 +1,90 @@
+// #include "ft_ping.h"
+
+// static int is_ip(char *str, int flag)
+// {
+// 	int c;
+
+// 	c = 0;
+// 	if (flag == AF_INET)
+// 	{
+// 		if (!ft_isnum(str)  || ft_strlen(str) > 4)
+// 			return (0);
+// 		c = ft_atoi(str);
+// 		if (c >= 0 && c <= 255)
+// 			return (1);
+// 	}
+// 	else if (flag == AF_INET6)
+// 	{
+// 		while (str[c])
+// 		{
+// 			if ((c < 'a' || c > 'f') && (c < 'A' || c > 'F')
+// 					&& (c < '0' && c > '9'))
+// 				return (0);
+// 			c++;
+// 		}
+// 		return (1);
+// 	}
+// 	return (0);
+// }
+
+// static int check_is_ip(char *arg, int flag, char *split)
+// {
+// 	char **tab;
+// 	int c;
+
+// 	c = 0;
+// 	tab = ft_strsplit(arg, split);
+// 	while (tab[c])
+// 	{
+// 		if (flag == AF_INET6 && !tab[c + 1])
+// 			if (is_ip(tab[c], AF_INET))
+// 				return (assign_fqdn_fam(tab, pg, arg, AF_INET6));
+// 		if (!is_ip(tab[c], flag))
+// 			return (assign_fqdn_fam(tab, pg, arg, 0));
+// 		c++;
+// 	} 
+// 	return (assign_fqdn_fam(tab, pg, arg, flag));
+// }
+
+// while (arg[j] != '.')
+		// {
+		// 	if (!ft_isdigit(arg[i]))
+		// 		malcolm_usage(arg, "bad ip");
+		// 	byte[j] = arg[i + j + dot];
+		// 	res[i] = arg[i + j + dot];
+		// 	j++;
+		// }
+		// if (dot >= 3)
+		// 	malcolm_usage(arg, "bad dot nbr");
+		// dot++;
+		// i += j;
+	// char *res = NULL;
+			// if (res == NULL)
+			// 	res = ft_strsub(byte, 0, j);
+			// else
+			// {
+			// 	res = ft_strjoinf(res, ".", 1);
+			// 	res = ft_strjoinf(res, byte, 1);
+			// }
+
+
+	//while (arg[i])
+	// {
+	// 	if (j < 3 && ft_isdigit(arg[i]))
+	// 	{
+	// 		byte[j] = arg[i];
+	// 		i++;
+	// 		j++;
+	// 	}
+	// 	else if (dot < 3 && arg[i] == '.')
+	// 	{
+	// 		dot++;
+	// 		tmp = ft_atoi(byte);
+	// 		if (tmp > 255)
+	// 			malcolm_usage(byte, "> 255");
+	// 		i++;
+	// 		j = 0;
+	// 	}
+	// 	else
+	// 		malcolm_usage(byte, "> 255");
+	// }
