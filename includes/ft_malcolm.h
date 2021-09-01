@@ -1,8 +1,9 @@
 #ifndef FT_MALCOLM_H
 # define FT_MALCOLM_H
 
+#include <signal.h>
 #include <netdb.h> //gethostbyname
-#include	<stdio.h>
+#include <stdio.h>
 #include "libft.h"
 #include <stdlib.h>
 #include <sys/types.h>
@@ -41,6 +42,8 @@ struct hostent {
 }
 */
 
+
+
 typedef struct s_malcolm
 {
 	char 				*ip_saddr;
@@ -52,6 +55,7 @@ typedef struct s_malcolm
 	int 				socket;
 	struct hostent hostname;
 	struct ifaddrs *ifap;
+  volatile sig_atomic_t sigint;
 }				t_malcolm;
 
 typedef struct s_arp_hdr {
@@ -68,6 +72,7 @@ typedef struct s_arp_hdr {
 
 // int check_ipv4_format(char *arg);
 // int check_macaddr_format(char *arg);
+void sig_handler(int sig);
 void init_n_fill_mlcml(const char **av, t_malcolm *mlcml);
 void malcolm_usage(char *error, char *str);
 

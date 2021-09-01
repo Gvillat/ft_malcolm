@@ -11,27 +11,58 @@ void debug_malcolm(t_malcolm *m)
 	printf("\nSource  IP {%s}\nSource  MAC {%s}\nDest    IP {%s}\nDest   MAC {%s}\n", m->ip_saddr, m->mac_saddr, m->ip_daddr, m->mac_daddr);
 }
 
+static void create_socket(t_malcolm *mlcml)
+{
+    int t;
+
+    t = 1;
+    if ((mlcml->socket = socket(PF_INET, SOCK_RAW, htons(ETH_P_ALL))) <= 0)
+        ft_perror("socket", "can't create socket", 32, 42);
+ 	if (setsockopt(pg->socket, IPPROTO_IP, IP_HDRINCL, &t, sizeof(int)))
+            ft_perror("setsockopt", "can't set IP_HDRINCL on socket", 32, 42);
+
+    if (setsockopt(pg->socket, SOL_IP, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout)) < 0)
+        ft_perror("setsockopt", "can't set IP_HDRINCL on socket", 32, 42);
+}
+
+void interface_found(struct ifaddrs *ifa, t_malcolm *mlcml)
+{
+	printf("\tFound available interface: <%s> @",ifa->ifa_name ); 
+	printf(" Address: <%s>\n", inet_ntoa(((struct sockaddr_in *)ifa->ifa_addr)->sin_addr));
+	create_socket(mlcml);
+	while (!mlcml->sigint)
+	{
+		wiat for arp request
+	}
+}
+
 void get_ifaddr(t_malcolm *mlcml)
 {
-	char buf[INET_ADDRSTRLEN];
-	struct hostent* host;
+	struct ifaddrs *ifa;
 
-	if (getifaddrs(&(mlcml->ifap)) == -1)
+	ifa = NULL;
+	if (getifaddrs(&(ifa)) == -1)
 	{
 		printf("error get_ifaddr\n");
 		exit(1);
 	}
-	while (mlcml->ifap)
+	while (ifa != NULL)
 	{
-		if (mlcml->ifap->ifa_addr->sa_family == AF_INET)
+		if (ifa->ifa_addr && (ifa->ifa_addr->sa_family == AF_INET) && ft_strncmp(ifa->ifa_name, "lo", 2))
 		{
-			host = gethostbyname(mlcml->ifap->ifa_name);
-			// inet_addr()
-			inet_ntop(AF_INET, mlcml->ifap->ifa_addr->sa_data, (void*)buf, INET_ADDRSTRLEN);
-			printf("%s\n", mlcml->ifap->ifa_name);
+			interface_found(ifa, mlclm);
+			freeifaddrs(ifa);
+			break;
 		}
-		mlcml->ifap = mlcml->ifap->ifa_next;
+		ifa = ifa->ifa_next;
 	}
+	freeifaddrs(ifa);
+}
+
+void    sig_handler(int sig, t_malcolm *mlcml)
+{
+    if (sig == SIGINT)
+        mlcml->sigint = 1;
 }
 
 int main(int argc, char const *argv[])
@@ -42,15 +73,50 @@ int main(int argc, char const *argv[])
 
 	if (argc != 5)
 		malcolm_usage("Error", "Invalid number of args");
+	init_n_fill_mlcml(argv, &mlcml);
+	get_ifaddr(&mlcml);
+	debug_malcolm(&mlcml);
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	// localHost = gethostbyname("");
 	// inet_addr(localIP);
 	// for (int i = 0; localHost->h_addr_list[i]; ++i)
 	// {
 		// printf("%s\n", localHost->h_addr);
 	// }
-	init_n_fill_mlcml(argv, &mlcml);
-	get_ifaddr(&mlcml);
-	freeifaddrs(mlcml.ifap);
-	debug_malcolm(&mlcml);
-	return 0;
-}
+// if (!(host = gethostbyname(mlcml->ifap->ifa_name)))
+				// printf("{%hu}\n", ntohs(mlcml->ifap->ifa_addr->sa_data));
+			// printf("%s          [%s]\n",mlcml->ifap->ifa_name, host->h_name);
+			// for (int i = 0; host->h_addr_list[i]; ++i)
+			// {
+				// printf("%s %s\n",host->h_addr_list[i], host->h_name);
+			// }
+			// local = gethostbyname("");
+			// inet_addr()

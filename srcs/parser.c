@@ -69,6 +69,7 @@ static int check_macaddr_format(char *arg)
 void init_n_fill_mlcml(const char **av, t_malcolm *mlcml)
 {
 	ft_memset(mlcml, 0, sizeof(t_malcolm));
+    signal(SIGINT, &sigint_handler);
 	if (av[1] && check_ipv4_format((char*)av[1]))
 		mlcml->ip_saddr = (char*)av[1];
 	if (av[2] && check_macaddr_format((char*)av[2]))
