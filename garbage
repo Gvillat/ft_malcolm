@@ -1,5 +1,7 @@
 // #include "ft_ping.h"
 
+sudo ./ft_malcolm 10.12.255.255 ff:bb:ff:ff:ee:ff 10.12.10.22 "10:dd:b1:**:**:**"
+
 // static int is_ip(char *str, int flag)
 // {
 // 	int c;

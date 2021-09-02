@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <linux/if_ether.h>
 
 /*
 ◦ sendto, recvfrom
@@ -42,21 +43,7 @@ struct hostent {
 }
 */
 
-
-
-typedef struct s_malcolm
-{
-	char 				*ip_saddr;
-	in_addr_t 		ips;
-	char 				*mac_saddr;
-	char 				*ip_daddr;
-	in_addr_t 		ipd;
-	char 				*mac_daddr;
-	int 				socket;
-	struct hostent hostname;
-	struct ifaddrs *ifap;
-  volatile sig_atomic_t sigint;
-}				t_malcolm;
+volatile sig_atomic_t g_sigint;
 
 typedef struct s_arp_hdr {
   uint16_t htype;
@@ -64,11 +51,26 @@ typedef struct s_arp_hdr {
   uint8_t hlen;
   uint8_t plen;
   uint16_t opcode;
-  uint8_t sender_mac[6];
-  uint8_t sender_ip[4];
-  uint8_t target_mac[6];
+  uint8_t source_mac[6][2];
+  uint8_t source_ip[4];
+  uint8_t target_mac[6][2];
   uint8_t target_ip[4];
-}		t_myarp;
+}   t_myarp;
+
+typedef struct s_malcolm
+{
+	char                     *ip_saddr;
+	in_addr_t                ips;
+	char                     *mac_saddr;
+	char                     *ip_daddr;
+	in_addr_t 		           ipd;
+	char                     *mac_daddr;
+	int                      socket;
+	struct hostent           hostname;
+	struct ifaddrs           *ifap;
+  t_myarp                   arphdr;
+}				t_malcolm;
+
 
 // int check_ipv4_format(char *arg);
 // int check_macaddr_format(char *arg);

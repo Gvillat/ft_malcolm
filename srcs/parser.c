@@ -1,33 +1,30 @@
 #include "ft_malcolm.h"
 
-static int check_ipv4_format(char *arg)
+static int check_ipv4_format(char *arg, uint8_t ip[4])
 {
-	int j = 0, dot = 0;
-	char byte[4];
+	int j = 0;
+	int tmp = 0;
+	char **tab = NULL;
 
 	if (!arg)
 		return (0);
-	ft_bzero(byte, 4);
-	for (int i = 0; arg[i]; i++)
+	if (!(tab = ft_strsplit(arg, ".")))
+		return (0);
+	if (ft_tablen(tab) != 4)
+		return (0);
+	while (tab[j])
 	{
-		if (j < 3 && ft_isdigit(arg[i]))
+		for (int i = 0; tab[j][i]; ++i)
 		{
-			byte[j] = arg[i];
-			j++;
+			if (i >= 3 || !ft_isdigit(tab[j][i]))
+      			malcolm_usage(tab[j], "j> 3 & !ft_isdigit");
 		}
-		else if (dot < 3 && arg[i] == '.')
-		{
-			dot++;
-			if (ft_atoi(byte) > 255)
-				malcolm_usage(byte, "> 255");
-			ft_bzero(byte, 4);
-			j = 0;
-		}
-		else
-			malcolm_usage(byte, "j> 3 & != .");
+    	tmp = (uint8_t)ft_atoi(tab[j]);
+    	if (tmp > 255)
+        	malcolm_usage(tab[j], "> 255");
+    	ip[j] = tmp;
+    	j++;
 	}
-	if (ft_atoi(byte) > 255)
-		malcolm_usage(byte, "> 255");
 	return 1;
 }
 
@@ -44,23 +41,40 @@ static int is_macaddr_char(char c)
 	return (0);
 }
 
-static int check_macaddr_format(char *arg)
+
+static int is_macaddr_byte(char *str)
 {
-	int i = 0, j = 0, deuxpts = 0;
+	char a, b;
+
+	if (!str || !str[0] || !str[1] || ft_strlen(str) != 2 )
+		return (0);
+	a = str[0];
+	b = str[1];
+	if (is_macaddr_char(a) && is_macaddr_char(b))
+		return (1);
+	return (0);
+}
+
+static int check_macaddr_format(char *arg, uint8_t mac[6][2])
+{
+	int i = 0;
+	char **tab = NULL;
+
 	if (!arg)
 		return (0);
-	while (arg[i])
+	if (!(tab = ft_strsplit(arg, ":")))
+		return (0);
+	if (ft_tablen(tab) != 6)
+		return (0);
+	while (tab[i])
 	{
-		if (is_macaddr_char(arg[i]))
-			j++;
-		else if (arg[i] == ':')
+		if (is_macaddr_byte(tab[i]))
 		{
-			if (deuxpts > 4 || j % 2 != 0)
-				malcolm_usage(&arg[i], "mauvais : nbr");
-			deuxpts++;
+			mac[i][0] = (unsigned char)tab[i][0];
+			mac[i][1] = (unsigned char)tab[i][1];
 		}
 		else
-			malcolm_usage(&arg[i], "bad mac @");
+			malcolm_usage(tab[i], "bad mac @");
 		i++;
 	}
 	return (1);
@@ -69,14 +83,15 @@ static int check_macaddr_format(char *arg)
 void init_n_fill_mlcml(const char **av, t_malcolm *mlcml)
 {
 	ft_memset(mlcml, 0, sizeof(t_malcolm));
-    signal(SIGINT, &sigint_handler);
-	if (av[1] && check_ipv4_format((char*)av[1]))
+	g_sigint = 0;
+    signal(SIGINT, &sig_handler);
+	if (av[1] && check_ipv4_format((char*)av[1], mlcml->arphdr.source_ip))
 		mlcml->ip_saddr = (char*)av[1];
-	if (av[2] && check_macaddr_format((char*)av[2]))
+	if (av[2] && check_macaddr_format((char*)av[2], mlcml->arphdr.source_mac))
 		mlcml->mac_saddr = (char*)av[2];
-	if (av[3] && check_ipv4_format((char*)av[3]))
+	if (av[3] && check_ipv4_format((char*)av[3], mlcml->arphdr.target_ip))
 		mlcml->ip_daddr = (char*)av[3];
-	if (av[4] && check_macaddr_format((char*)av[4]))
+	if (av[4] && check_macaddr_format((char*)av[4], mlcml->arphdr.target_mac))
 		mlcml->mac_daddr = (char*)av[4];
 	if ((mlcml->ips = inet_addr(av[1])) == INADDR_NONE)
 		malcolm_usage((char*)av[1], "bad ip @");

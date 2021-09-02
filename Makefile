@@ -58,6 +58,7 @@ PATHS				+=	$(O_PATH)
 
 SRC					+= $(S_PATH)main.c
 SRC					+= $(S_PATH)parser.c
+SRC					+= $(S_PATH)pkt.c
 
 # Headers
 
