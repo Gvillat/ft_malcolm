@@ -55,7 +55,7 @@ static int is_macaddr_byte(char *str)
 	return (0);
 }
 
-static int check_macaddr_format(char *arg, uint8_t mac[6][2])
+static int check_macaddr_format(char *arg, uint8_t mac[6])
 {
 	int i = 0;
 	char **tab = NULL;
@@ -65,18 +65,22 @@ static int check_macaddr_format(char *arg, uint8_t mac[6][2])
 	if (!(tab = ft_strsplit(arg, ":")))
 		return (0);
 	if (ft_tablen(tab) != 6)
+	{
+		ft_tabfree(tab);
 		return (0);
+	}
 	while (tab[i])
 	{
 		if (is_macaddr_byte(tab[i]))
-		{
-			mac[i][0] = (unsigned char)tab[i][0];
-			mac[i][1] = (unsigned char)tab[i][1];
-		}
+			mac[i] = ft_atoi_base(tab[i], "0123456789abcdef");
 		else
-			malcolm_usage(tab[i], "bad mac @");
+		{
+			ft_tabfree(tab);
+			malcolm_usage(arg, "bad mac @");
+		}
 		i++;
 	}
+	ft_tabfree(tab);
 	return (1);
 }
 

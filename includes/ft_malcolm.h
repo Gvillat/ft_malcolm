@@ -6,14 +6,36 @@
 #include <stdio.h>
 #include "libft.h"
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <ifaddrs.h> //getifadddr freeifaddr
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
+#include <linux/if_arp.h>
 
 /*
+
+      printf("htype [%0X]\n\
+ptype [%0X]\n\
+hlen [%0X]\n\
+plen [%0X]\n\
+opcode [%0X]\n\
+source_mac [%s]\n\
+source_ip [%s]\n\
+target_mac [%s]\n\
+target_ip [%s]\n",
+arp_resp->htype,
+arp_resp->ptype,
+arp_resp->hlen,
+arp_resp->plen,
+arp_resp->opcode,
+(char*)arp_resp->source_mac,
+arp_resp->source_ip,
+(char*)arp_resp->target_mac,
+arp_resp->target_ip);
+
 ◦ sendto, recvfrom
 ◦ socket, setsockopt
 ◦ getuid, close, signal
@@ -43,18 +65,18 @@ struct hostent {
 }
 */
 
-volatile sig_atomic_t g_sigint;
+extern volatile sig_atomic_t g_sigint;
 
 typedef struct s_arp_hdr {
-  uint16_t htype;
-  uint16_t ptype;
-  uint8_t hlen;
-  uint8_t plen;
-  uint16_t opcode;
-  uint8_t source_mac[6][2];
-  uint8_t source_ip[4];
-  uint8_t target_mac[6][2];
-  uint8_t target_ip[4];
+  unsigned short    htype;
+  unsigned short    ptype;
+  unsigned char     hlen;
+  unsigned char     plen;
+  unsigned short    opcode;
+  unsigned char     source_mac[6];
+  unsigned char     source_ip[4];
+  unsigned char     target_mac[6];
+  unsigned char     target_ip[4];
 }   t_myarp;
 
 typedef struct s_malcolm
@@ -63,12 +85,14 @@ typedef struct s_malcolm
 	in_addr_t                ips;
 	char                     *mac_saddr;
 	char                     *ip_daddr;
-	in_addr_t 		           ipd;
+	in_addr_t 		         ipd;
 	char                     *mac_daddr;
+    uint8_t                  mac_laddr[6];
+    uint8_t                  ip_laddr[4];
 	int                      socket;
 	struct hostent           hostname;
 	struct ifaddrs           *ifap;
-  t_myarp                   arphdr;
+  t_myarp                    arphdr;
 }				t_malcolm;
 
 
@@ -77,5 +101,6 @@ typedef struct s_malcolm
 void sig_handler(int sig);
 void init_n_fill_mlcml(const char **av, t_malcolm *mlcml);
 void malcolm_usage(char *error, char *str);
+void letsgo_mitm(t_malcolm *mlcml, struct sockaddr_ll *s);
 
 #endif
